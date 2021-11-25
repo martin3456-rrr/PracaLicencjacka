@@ -6,9 +6,8 @@ labels:
 - boardgame
 - game
 - chessboard
-timeCreated: 1462534583
-licenseType: Store
-NativeFormatImporter:
+PrefabImporter:
+  externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
