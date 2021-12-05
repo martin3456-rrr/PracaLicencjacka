@@ -20,6 +20,7 @@ public class ChessBoard : MonoBehaviour
     //LOGIC
     private ChessPiece[,] chessPieces;
     private ChessPiece currentlyDragging;
+    private List<Vector2Int> availableMoves = new List<Vector2Int>();
     private List<ChessPiece> deadWhites = new List<ChessPiece>();
     private List<ChessPiece> deadBlacks = new List<ChessPiece>();
     private const int Tile_X = 8;
@@ -44,7 +45,7 @@ public class ChessBoard : MonoBehaviour
 
         RaycastHit info;
         Ray ray = currentCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask("Tile", "Hover")))
+        if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask("Tile", "Hover","Highlight")))
         {
             //Get the indexes of the tile i've hit(Uzyskaj indeksy kafelka, w który trafi³em)
             Vector2Int hitPosition = LookupTileIndex(info.transform.gameObject);
@@ -71,6 +72,9 @@ public class ChessBoard : MonoBehaviour
                     if (true)
                     {
                         currentlyDragging = chessPieces[hitPosition.x, hitPosition.y];
+                        //Get a list of where i can go, hightlight tiles as well
+                        availableMoves = currentlyDragging.GetAvailableMoves(ref chessPieces, Tile_X, Tile_Y);
+                        HighlightTiles();
                     }
                 }
             }
@@ -78,16 +82,15 @@ public class ChessBoard : MonoBehaviour
             if (currentlyDragging!=null && Input.GetMouseButtonUp(0))
             {
                 Vector2Int previousPosition = new Vector2Int(currentlyDragging.X,currentlyDragging.Y);
+                
                 bool validMove = MoveTo(currentlyDragging, hitPosition.x, hitPosition.y);
                 if(!validMove)
                 {
                     currentlyDragging.SetPosition(GetTileCenter(previousPosition.x, previousPosition.y));
                     currentlyDragging = null;
                 }
-                else
-                {
-                    currentlyDragging = null;
-                }
+                currentlyDragging = null;
+                RemoveHighlightTiles();
             }
         }
         else
@@ -95,13 +98,14 @@ public class ChessBoard : MonoBehaviour
             
             if (currentHover != -Vector2Int.one)
             {
-                tiles[currentHover.x, currentHover.y].layer = LayerMask.NameToLayer("Tile");
+                tiles[currentHover.x, currentHover.y].layer = (ContainsValidMove(ref availableMoves,currentHover))? LayerMask.NameToLayer("Hightlight") : LayerMask.NameToLayer("Tile");
                 currentHover = -Vector2Int.one;
             }
             if(currentlyDragging && Input.GetMouseButtonUp(0))
             {
                 currentlyDragging.SetPosition(GetTileCenter(currentlyDragging.X, currentlyDragging.Y));
                 currentlyDragging = null;
+                RemoveHighlightTiles();
             }
         }
         //If we're dragging a piece(Jeœli przeci¹gamy kawa³ek)
@@ -224,42 +228,62 @@ public class ChessBoard : MonoBehaviour
     {
         return new Vector3(x * tileSize, yOffset, y * tileSize) - bounds + new Vector3(tileSize / 2, 0, tileSize / 2);
     }
-    //Operations
-    private Vector2Int LookupTileIndex(GameObject hitInfo)
+
+    //Highlight Tiles
+    private void HighlightTiles()
     {
-        for (int x = 0; x < Tile_X; x++)
+        for (int i = 0; i < availableMoves.Count; i++)
         {
-            for (int y = 0; y < Tile_Y; y++)
-            {
-                if (tiles[x, y] == hitInfo)
-                {
-                    return new Vector2Int(x, y);
-                }
-            }
+            tiles[availableMoves[i].x, availableMoves[i].y].layer = LayerMask.NameToLayer("Highlight");
         }
-        return -Vector2Int.one; //Invalid
+    }
+    private void RemoveHighlightTiles()
+    {
+        for (int i = 0; i < availableMoves.Count; i++)
+        {
+            tiles[availableMoves[i].x, availableMoves[i].y].layer = LayerMask.NameToLayer("Tile");
+        }
+        availableMoves.Clear();
     }
 
+    //Operations
+
+    private bool ContainsValidMove(ref List<Vector2Int> moves,Vector2 pos)
+    {
+        for (int i = 0; i < moves.Count; i++)
+        {
+            if(moves[i].x==pos.x && moves[i].y==pos.y)
+            {
+                return true;
+            }
+            
+        }
+        return false;
+    }
     private bool MoveTo(ChessPiece cp, int x, int y)
     {
+        if(!ContainsValidMove(ref availableMoves , new Vector2(x,y)))
+        {
+            return false;
+        }
         Vector2Int previousPostiton = new Vector2Int(cp.X, cp.Y);
 
         // Is there another piece on the target position(Czy na pozycji docelowej jest inny kawa³ek)
-        if (chessPieces[x,y]!=null)
+        if (chessPieces[x, y] != null)
         {
             ChessPiece ocp = chessPieces[x, y];
-            if(cp.team==ocp.team)
+            if (cp.team == ocp.team)
             {
                 return false;
             }
             //If its the enemy team(Jeœli to dru¿yna wroga)
-            if (ocp.team==0)
+            if (ocp.team == 0)
             {
                 deadWhites.Add(ocp);
-                ocp.SetScale(Vector3.one*deathSize);
+                ocp.SetScale(Vector3.one * deathSize);
                 ocp.SetPosition(
-                    new Vector3(8 * tileSize, yOffset, -1 * tileSize) - bounds 
-                    + new Vector3(tileSize / 2, 0, tileSize / 2) + 
+                    new Vector3(8 * tileSize, yOffset, -1 * tileSize) - bounds
+                    + new Vector3(tileSize / 2, 0, tileSize / 2) +
                     (Vector3.forward * deathSpacing) * deadWhites.Count);
             }
             else
@@ -277,4 +301,20 @@ public class ChessBoard : MonoBehaviour
         PositionSinglePiece(x, y);
         return true;
     }
+    private Vector2Int LookupTileIndex(GameObject hitInfo)
+    {
+        for (int x = 0; x < Tile_X; x++)
+        {
+            for (int y = 0; y < Tile_Y; y++)
+            {
+                if (tiles[x, y] == hitInfo)
+                {
+                    return new Vector2Int(x, y);
+                }
+            }
+        }
+        return -Vector2Int.one; //Invalid
+    }
+
+
 }
