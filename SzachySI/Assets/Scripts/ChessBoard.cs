@@ -12,6 +12,7 @@ public class ChessBoard : MonoBehaviour
     [SerializeField] private float deathSize = 0.3f;
     [SerializeField] private float deathSpacing = 0.3f;
     [SerializeField] private float dragOffset = 1.5f;
+    [SerializeField] private GameObject victoryScreen;
 
     [Header("Prefabs & Materials")]
     [SerializeField] private GameObject[] prefabs;
@@ -29,8 +30,10 @@ public class ChessBoard : MonoBehaviour
     private Camera currentCamera;
     private Vector2Int currentHover;
     private Vector3 bounds;
+    private bool IsWhiteTeam;
     private void Awake()
     {
+        IsWhiteTeam = true;
         GenerateAllFiles(tileSize, Tile_X, Tile_Y);
         SpawnAllPieces();
         PositionAllPieces();
@@ -69,7 +72,7 @@ public class ChessBoard : MonoBehaviour
                 if (chessPieces[hitPosition.x, hitPosition.y] != null)
                 {
                     //Is it our turn?(Czy to nasza kolej?)
-                    if (true)
+                    if ((chessPieces[hitPosition.x, hitPosition.y].team==0 && IsWhiteTeam) || (chessPieces[hitPosition.x, hitPosition.y].team == 1 && !IsWhiteTeam))
                     {
                         currentlyDragging = chessPieces[hitPosition.x, hitPosition.y];
                         //Get a list of where i can go, hightlight tiles as well
@@ -246,6 +249,59 @@ public class ChessBoard : MonoBehaviour
         availableMoves.Clear();
     }
 
+    //Checkmate
+    private void ChessMate(int team)
+    {
+        DisplayVicotry(team);
+    }
+    private void DisplayVicotry(int winnigTeam)
+    {
+        victoryScreen.SetActive(true);
+        victoryScreen.transform.GetChild(winnigTeam).gameObject.SetActive(true);
+    }
+    public void OnResetButton()
+    {
+        //UI
+        victoryScreen.transform.GetChild(0).gameObject.SetActive(false);
+        victoryScreen.transform.GetChild(1).gameObject.SetActive(false);
+        victoryScreen.SetActive(false);
+
+        //Fields reset
+        currentlyDragging = null;
+        availableMoves = new List<Vector2Int>();
+
+        //Clean up
+        for (int x = 0; x < Tile_X; x++)
+        {
+            for (int y = 0; y < Tile_Y; y++)
+            {
+                if(chessPieces[x,y]!=null)
+                {
+                    Destroy(chessPieces[x, y].gameObject);
+                }
+                chessPieces[x, y] = null;
+            }
+        }
+        for (int i = 0; i < deadWhites.Count; i++)
+        {
+            Destroy(deadWhites[i].gameObject);
+        }
+        for (int i = 0; i < deadBlacks.Count; i++)
+        {
+            Destroy(deadBlacks[i].gameObject);
+        }
+        deadWhites.Clear();
+        deadBlacks.Clear();
+        SpawnAllPieces();
+        PositionAllPieces();
+        IsWhiteTeam = true;
+
+    }
+    public void OnExitButton()
+    {
+        Application.Quit();
+    }
+
     //Operations
 
     private bool ContainsValidMove(ref List<Vector2Int> moves,Vector2 pos)
@@ -279,6 +335,10 @@ public class ChessBoard : MonoBehaviour
             //If its the enemy team(Jeœli to dru¿yna wroga)
             if (ocp.team == 0)
             {
+                if(ocp.type==ChessPieceType.King)
+                {
+                    ChessMate(1);
+                }
                 deadWhites.Add(ocp);
                 ocp.SetScale(Vector3.one * deathSize);
                 ocp.SetPosition(
@@ -288,6 +348,10 @@ public class ChessBoard : MonoBehaviour
             }
             else
             {
+                if (ocp.type == ChessPieceType.King)
+                {
+                    ChessMate(0);
+                }
                 deadBlacks.Add(ocp);
                 ocp.SetScale(Vector3.one * deathSize);
                 ocp.SetPosition(
@@ -299,6 +363,8 @@ public class ChessBoard : MonoBehaviour
         chessPieces[x, y] = cp;
         chessPieces[previousPostiton.x, previousPostiton.y] = null;
         PositionSinglePiece(x, y);
+
+        IsWhiteTeam = !IsWhiteTeam;
         return true;
     }
     private Vector2Int LookupTileIndex(GameObject hitInfo)
