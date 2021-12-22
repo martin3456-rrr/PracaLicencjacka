@@ -4,8 +4,8 @@ using UnityEngine;
 public enum ChessPieceType
 {
     None = 0,
-    Pawn=1,
-    Rook=2,
+    Pawn = 1,
+    Rook = 2,
     Knight = 3,
     Bishop = 4,
     Quenn = 5,
@@ -24,7 +24,7 @@ public class ChessPiece : MonoBehaviour
 
     private void Start()
     {
-        transform.rotation = Quaternion.Euler((team == 0) ? Vector3.zero : new Vector3(0, 100, 0));
+        transform.rotation = Quaternion.Euler((team == 1) ? Vector3.zero : new Vector3(0, 180, 0));
     }
 
     private void Update()
@@ -43,7 +43,10 @@ public class ChessPiece : MonoBehaviour
         r.Add(new Vector2Int(4, 4));
         return r;
     }
-
+    public virtual SpecialMove GetSpecialMoves(ref ChessPiece[,] board,ref List<Vector2Int[]> moveList,ref List<Vector2Int> availableMoves)
+    {
+        return SpecialMove.None;
+    }
     public virtual void SetPosition(Vector3 position,bool force=false)
     {
         desiredPosition = position;
