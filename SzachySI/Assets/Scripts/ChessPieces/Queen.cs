@@ -47,7 +47,7 @@ public class Queen : ChessPiece
             }
             if (board[i, Y] != null)
             {
-                if (board[X, i].team != team)
+                if (board[i, Y].team != team)
                 {
                     r.Add(new Vector2Int(i, Y));
                 }
@@ -63,7 +63,7 @@ public class Queen : ChessPiece
             }
             if (board[i, Y] != null)
             {
-                if (board[X, i].team != team)
+                if (board[i, Y].team != team)
                 {
                     r.Add(new Vector2Int(i, Y));
                 }
@@ -138,4 +138,3 @@ public class Queen : ChessPiece
         return r;
     }
 }
-

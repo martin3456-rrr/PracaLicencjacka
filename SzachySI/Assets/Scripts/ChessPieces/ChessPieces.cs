@@ -8,19 +8,19 @@ public enum ChessPieceType
     Rook = 2,
     Knight = 3,
     Bishop = 4,
-    Quenn = 5,
+    Queen = 5,
     King = 6
-
 }
+
 public class ChessPiece : MonoBehaviour
 {
-    public int team;
+    public int team; // 0 - Bia³e / 1 - Czarne
     public int X;
     public int Y;
     public ChessPieceType type;
 
     private Vector3 desiredPosition;
-    private Vector3 desiredScale=Vector3.one;
+    private Vector3 desiredScale = Vector3.one;
 
     private void Start()
     {
@@ -31,10 +31,9 @@ public class ChessPiece : MonoBehaviour
     {
         transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * 10);
         transform.localScale = Vector3.Lerp(transform.localScale, desiredScale, Time.deltaTime * 10);
-
     }
 
-    public virtual List<Vector2Int> GetAvailableMoves(ref ChessPiece[,] board,int tileX,int tileY)
+    public virtual List<Vector2Int> GetAvailableMoves(ref ChessPiece[,] board, int tileX, int tileY)
     {
         List<Vector2Int> r = new List<Vector2Int>();
         r.Add(new Vector2Int(3, 3));
@@ -43,25 +42,23 @@ public class ChessPiece : MonoBehaviour
         r.Add(new Vector2Int(4, 4));
         return r;
     }
-    public virtual SpecialMove GetSpecialMoves(ref ChessPiece[,] board,ref List<Vector2Int[]> moveList,ref List<Vector2Int> availableMoves)
+
+    public virtual SpecialMove GetSpecialMoves(ref ChessPiece[,] board, ref List<Vector2Int[]> moveList, ref List<Vector2Int> availableMoves)
     {
         return SpecialMove.None;
     }
-    public virtual void SetPosition(Vector3 position,bool force=false)
+
+    public virtual void SetPosition(Vector3 position, bool force = false)
     {
         desiredPosition = position;
-        if(force)
-        {
+        if (force)
             transform.position = desiredPosition;
-        }
     }
+
     public virtual void SetScale(Vector3 scale, bool force = false)
     {
         desiredScale = scale;
         if (force)
-        {
             transform.position = desiredScale;
-        }
     }
-
 }

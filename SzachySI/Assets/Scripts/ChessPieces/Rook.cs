@@ -23,7 +23,7 @@ public class Rook : ChessPiece
             }
         }
         //Up
-        for (int i = Y + 1; i <tileY; i++)
+        for (int i = Y + 1; i < tileY; i++)
         {
             if (board[X, i] == null)
             {
@@ -45,17 +45,17 @@ public class Rook : ChessPiece
             {
                 r.Add(new Vector2Int(i, Y));
             }
-            if (board[i,Y] != null)
+            if (board[i, Y] != null)
             {
-                if (board[X, i].team != team)
+                if (board[i, Y].team != team)
                 {
-                    r.Add(new Vector2Int(i,Y));
+                    r.Add(new Vector2Int(i, Y));
                 }
                 break;
             }
         }
         //Right
-        for (int i = X + 1; i<tileX; i++)
+        for (int i = X + 1; i < tileX; i++)
         {
             if (board[i, Y] == null)
             {
@@ -63,7 +63,7 @@ public class Rook : ChessPiece
             }
             if (board[i, Y] != null)
             {
-                if (board[X, i].team != team)
+                if (board[i, Y].team != team)
                 {
                     r.Add(new Vector2Int(i, Y));
                 }
