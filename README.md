@@ -26,5 +26,7 @@ Oznacza to jedno: Castling.
  # Uruchomienie źródeł
 Otrzymany projekt należy uruchomić Unity Hub następnie kliknąć w zakładke Open wybrać folder projektu który jest zapisany na dysk i wybieramy wersje która została podana przy dokumentacji projektu
 Lub pobrać projekt z github https://github.com/martin3456-rrr/PracaLicencjacka - Stępniewski Marcin
+# Kompilacja źródeł
+Aby skompilować projekt w unity należy wejść w File -> Bulid Settings ->Bulid i tworzymy folder np.Bulid i klikamy wybierz folder kompilacja powinna już nastąpić
 # Uruchomienie gry
 Aby uruchomić grę należy pobrać plik SzachySI.exe z folderu Bulid i włączyć wtedy gra powinna się uruchomić
