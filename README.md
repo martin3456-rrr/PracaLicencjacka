@@ -10,7 +10,10 @@ Na początku gry plansza jest pełna pionów i obie strony mają mnóstwo okazji
 Dlatego tak ważne jest, aby zapewnij swojemu królowi bezpieczeństwo jak tylko będziesz miał szansę.
 Oznacza to jedno: Castling.
 # Wygląd aplikacji
-![2022-05-09 (2)](https://user-images.githubusercontent.com/62383498/167431913-bda9a10d-b71d-46ec-8fcc-73c0fe3229e9.png)
+3D
+![3D](https://github.com/user-attachments/assets/c7b38672-0d60-4580-8ec5-91c03d65d589)
+2D
+![2D](https://github.com/user-attachments/assets/adffcd58-0093-469f-aa1b-81e57a542972)
 # Wykorzystane oprogramowania
  Unity 2023.2.20f1
  
