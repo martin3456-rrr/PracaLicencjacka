@@ -17,7 +17,7 @@ Oznacza to jedno: Castling.
 # Wykorzystane oprogramowania
  Unity 2023.2.20f1
  
- Visual Studio 2022 17.10
+ Visual Studio 2022 v.17
 # Wymagania sprzętowe
  Procesor:Intel i5-7200U 2 rdzenie 4 logiczne lub lepszy
  
